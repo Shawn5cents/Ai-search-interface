@@ -1,0 +1,39 @@
+version: 2
+updates:
+  # Frontend dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    versioning-strategy: auto
+    labels:
+      - "dependencies"
+      - "frontend"
+    reviewers:
+      - "Shawn5cents"
+
+  # Backend dependencies
+  - package-ecosystem: "npm"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    versioning-strategy: auto
+    labels:
+      - "dependencies"
+      - "backend"
+    reviewers:
+      - "Shawn5cents"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
+    reviewers:
+      - "Shawn5cents"
