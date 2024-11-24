@@ -11,6 +11,7 @@ const { logger, httpLogger } = require('./middleware/logger');
 const { initializeRedis, cacheMiddleware } = require('./middleware/cache');
 const { searchValidation, validate } = require('./middleware/validation');
 const { metricsMiddleware, getMetrics } = require('./middleware/metrics');
+const apiRoutes = require('./routes/api');
 const path = require('path');
 
 const app = express();
@@ -70,12 +71,7 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-app.post('/api/search',
-  searchValidation,
-  validate,
-  cacheMiddleware,
-  searchOpenAI
-);
+app.use('/api', apiRoutes);
 
 // Static files for PWA
 if (process.env.NODE_ENV === 'production') {

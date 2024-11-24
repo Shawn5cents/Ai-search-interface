@@ -158,3 +158,47 @@ export const searchOpenAI = async (query) => {
   
   return result;
 };
+
+// Search API function
+export const searchAPI = async (query) => {
+  try {
+    const response = await fetch(`${API_URL}/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Search API Error:', error);
+    throw error;
+  }
+};
+
+// Web Search API function
+export const webSearchAPI = async (query) => {
+  try {
+    const response = await fetch(`${API_URL}/web-search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Web Search API Error:', error);
+    throw error;
+  }
+};
