@@ -1,8 +1,7 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const puppeteer = require('puppeteer');
 const logger = require('../utils/logger');
 
-const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
-const PERPLEXITY_API_URL = 'https://api.perplexity.ai/search';
+const PERPLEXITY_URL = 'https://www.perplexity.ai/';
 
 const searchWeb = async (req, res) => {
     try {
@@ -12,41 +11,56 @@ const searchWeb = async (req, res) => {
             return res.status(400).json({ error: 'Query is required' });
         }
 
-        const response = await fetch(PERPLEXITY_API_URL, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query,
-                max_tokens: 1000,
-                temperature: 0.7,
-            }),
+        const browser = await puppeteer.launch({
+            headless: 'new',
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
-        if (!response.ok) {
-            const error = await response.text();
-            logger.error(`Perplexity API error: ${error}`);
-            return res.status(response.status).json({ 
-                error: 'Failed to fetch search results',
-                details: error
+        try {
+            const page = await browser.newPage();
+            
+            // Navigate to Perplexity
+            await page.goto(PERPLEXITY_URL);
+            
+            // Wait for search input and type query
+            await page.waitForSelector('textarea[placeholder*="Ask"]');
+            await page.type('textarea[placeholder*="Ask"]', query);
+            
+            // Press Enter to search
+            await page.keyboard.press('Enter');
+            
+            // Wait for results
+            await page.waitForSelector('.prose', { timeout: 30000 });
+            
+            // Get the search results
+            const results = await page.evaluate(() => {
+                const resultElement = document.querySelector('.prose');
+                return resultElement ? resultElement.innerText : '';
             });
+
+            // Get sources if available
+            const sources = await page.evaluate(() => {
+                const sourceElements = document.querySelectorAll('a[href*="://"]');
+                return Array.from(sourceElements, el => ({
+                    title: el.innerText,
+                    url: el.href
+                })).slice(0, 5); // Get first 5 sources
+            });
+
+            logger.info(`Web search successful for query: ${query}`);
+            
+            res.json({
+                searchResults: results,
+                metadata: {
+                    source: 'perplexity',
+                    timestamp: new Date().toISOString(),
+                    sources: sources
+                }
+            });
+
+        } finally {
+            await browser.close();
         }
-
-        const data = await response.json();
-        
-        // Transform the response to match our application's format
-        const transformedResults = {
-            searchResults: data.text,
-            metadata: {
-                source: 'perplexity',
-                timestamp: new Date().toISOString(),
-            }
-        };
-
-        logger.info(`Web search successful for query: ${query}`);
-        res.json(transformedResults);
 
     } catch (error) {
         logger.error(`Web search error: ${error.message}`);
