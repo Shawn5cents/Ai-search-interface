@@ -1,0 +1,39 @@
+{
+  "short_name": "AI Search",
+  "name": "AI Search Interface",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "orientation": "portrait",
+  "description": "Modern AI Search Interface",
+  "dir": "ltr",
+  "lang": "en-US",
+  "prefer_related_applications": false,
+  "categories": ["productivity", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "New Search",
+      "url": "/",
+      "description": "Start a new AI search"
+    }
+  ]
+}
